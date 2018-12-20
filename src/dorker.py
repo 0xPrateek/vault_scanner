@@ -22,6 +22,7 @@ def modifyLINK(url):
     ret = ''.join(list1)
     return ret
 
+
 def start_dorking(search, page_count):
     web_list = []
     m_search = modifyLINK(search)
@@ -49,5 +50,5 @@ def start_dorking(search, page_count):
                 web_list.append(res)
                 print("\033[1;37m--> \033[1;32m", res, end=" \n")
         count += 10
-
+        
     return web_list
