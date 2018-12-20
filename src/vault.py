@@ -20,6 +20,7 @@ def check_url(url: str):
 
     return url
 
+
 def check_ip(ip: str):
     """
     Check whether the input IP is valid or not
@@ -30,6 +31,7 @@ def check_ip(ip: str):
         colors.error('Please enter a valid IP address')
         LOGGER.error('[-] Please enter a valid IP address')
         sys.exit(1)
+
 
 def ssl(args):
     if not args.url:
@@ -61,6 +63,7 @@ def ssl(args):
         LOGGER.error('[-] Could not import the required module.')
     except Exception as e:
         LOGGER.error(e)
+
 
 def info(args):
     if not args.url:
@@ -109,6 +112,7 @@ def info(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def comment(args):
     if not args.url:
         colors.error('Please enter an URL for finding comments')
@@ -139,6 +143,7 @@ def comment(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def fuzz(args):
     if not args.url:
         colors.error('Please enter an URL for fuzzing')
@@ -155,6 +160,7 @@ def fuzz(args):
         LOGGER.error('[-] Could not import the required module.')
     except Exception as e:
         LOGGER.error(e)
+
 
 def fin(args):
     if not args.ip:
@@ -177,6 +183,7 @@ def fin(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def null(args):
     if not args.ip:
         colors.error('Please enter an IP address for scanning')
@@ -198,6 +205,7 @@ def null(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def ack(args):
     if not args.ip:
         colors.error('Please enter an IP address for scanning')
@@ -217,6 +225,7 @@ def ack(args):
         LOGGER.error('[-] Could not import the required module.')
     except Exception as e:
         LOGGER.error(e)
+
 
 def whois(args):
     if not args.ip:
@@ -250,6 +259,7 @@ def whois(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def lfi(args):
     if not args.url:
         colors.error('Please enter an URL  for scanning')
@@ -268,6 +278,7 @@ def lfi(args):
         sys.exit(1)
     except Exception as e:
         LOGGER.error(e)
+
 
 def dork(args):
 
@@ -288,6 +299,7 @@ def dork(args):
                 for k in web_lists:
                     f.write(str(k) + os.linesep)
             colors.success('File has been saved successfully')
+
 
 def xmas(args):
     if not args.ip:
@@ -310,6 +322,7 @@ def xmas(args):
     except Exception as e:
         LOGGER.error(e)
 
+
 def ping_sweep(args):
     if not args.ip:
         colors.error('Please enter an IP address for scanning')
@@ -329,6 +342,7 @@ def ping_sweep(args):
             colors.error('Could not import the required module.')
         except Exception as e:
             print(e)
+
 
 def xss(args):
     if args.url:
@@ -352,7 +366,7 @@ def xss(args):
                 LOGGER.error('[-] Could not import the required module.')
             except Exception as e:
                 LOGGER.error(e)
-                
+
         try:
             import xss
 
@@ -369,6 +383,7 @@ def xss(args):
         colors.error('Please enter an URL for XSS Scanning')
         LOGGER.error('[-] Please enter an URL for XSS Scanning')
         sys.exit(1)
+
 
 def ddos(args):
     if args.url is None and args.ip is None:
@@ -389,12 +404,55 @@ def ddos(args):
             print(e)
             LOGGER.error(e)
             sys.exit(1)
-            
-def dorking():
-    dorks=args.dork
-    page=int(input("\nNumber of Pages to scrap :: \033[1;37m"))
-    print('\n\033[1;37m[>]Searching ...\033[1;37m  \n')
-    dorker.start_dorking(dorks,page)
+
+
+def crawl(args):
+    if args.url is None:
+        colors.error('Please provide either an URL to perform Crawling')
+        sys.exit(1)
+    else:
+        try:
+            from lib.crawler import caller
+
+            name = input('Enter the name of folder:->')
+            C = caller.Crawler(url=args.url, pname=name)
+            if args.cri is None:
+                C.start(return_set=False)
+                return ''
+            else:
+            	return C.start(return_set=True)
+            print('[X]Crawling completed')
+
+        except ImportError:
+            colors.error('Could not import the required module')
+            LOGGER.error('[-] Could not import the required module')
+        except Exception as e:
+            print(e)
+            LOGGER.error(e)
+            sys.exit(1)
+
+
+def scrap(args):
+    if args.url is None:
+        colors.error('Please provide URL to perform Scraping')
+        sys.exit(1)
+    else:
+        try:
+
+            from lib.crawler import finder
+            links , path =crawl(args)
+            finder.initiate(links, path)
+            print('[X]Scraping completed')
+
+        except ImportError:
+            colors.error('Could not import the required module')
+            LOGGER.error('[-] Could not import the required module')
+        except Exception as e:
+            print(e)
+            LOGGER.error(e)
+            sys.exit(1)
+
+
 
 if __name__ == '__main__':
 
@@ -441,6 +499,8 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dork', help='Perform google dorking')
     parser.add_argument('-ddos', action='store_true', help='Perform DDoS attack')
     parser.add_argument('-interval', help='Interval time for sending packets')
+    parser.add_argument('-cr', action='store_true', help='For extracting links from a Web page')
+    parser.add_argument('-cri', action='store_true', help='For extracting images from a Web page')
     parser.add_argument('-all', action='store_true', help='Run all scans')
 
     colors.info("Please Check log file for information about any errors")
@@ -449,7 +509,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
-        
+
     args = parser.parse_args()
 
     if args.all:
@@ -520,5 +580,11 @@ if __name__ == '__main__':
     if args.ddos:
         ddos(args)
 
+    if args.cr:
+        crawl(args)
+
+    if args.cri:
+        scrap(args)
+        
     if args.dork:
         dork(args)
