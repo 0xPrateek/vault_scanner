@@ -23,7 +23,8 @@ class ARPScan(object):
         if start_ip is None:
             self.start_ip = 0
         elif (int(start_ip) < 0 or int(start_ip) > 256):
-            colors.error('Start range cannot be less than 0 or greater than 256')
+            colors.error('Start range cannot be less than 0 or greater than '
+                         '256')
             sys.exit(1)
         else:
             self.start_ip = int(start_ip)
@@ -62,20 +63,26 @@ class ARPScan(object):
         :t1: Start time of the scan
         """
 
-        print('-' * 35)
-        print('IP'.ljust(12, ' ') + '|' + '  MAC'.ljust(21, ' ') + '|')
-        print('-' * 35)
+        print('-' * 36)
+        print('IP'.ljust(15, ' ') + '|' + '  MAC'.ljust(19, ' ') + '|')
+        print('-' * 36)
+
+        index = 1
+        response_dict = {}
 
         for packets in self.answ_packets:
 
             for ele in packets:
-                data = ele[1].psrc + ' : ' + ele[1].src
+                data = str(index) + '. ' + ele[1].psrc + ' : ' + ele[1].src
+                response_dict[index] = [ele[1].psrc, ele[1].src]
                 print(data.ljust(33, ' '), '|')
                 print('-' * 35)
+                index = index + 1
 
         t2 = time.time()
-
         colors.success('Completed in {}'.format(t2-t1))
+
+        return index, response_dict
 
     def setIP(self):
         self.ip = self.ip.split('.')[0:3]
@@ -84,7 +91,7 @@ class ARPScan(object):
     def ARPScan(self, end):
         """
         Sends ARP Request packets to the destination IP
-        
+
         :end: End part of the IP
         """
 
@@ -115,4 +122,5 @@ class ARPScan(object):
                 task = executor.submit(self.ARPScan, (ip))
                 tasks.append(task)
 
-        self.parseResult(t1)
+        index, response_dict = self.parseResult(t1)
+        return index, response_dict

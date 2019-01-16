@@ -15,7 +15,7 @@ class HeaderVuln(object):
         try:
             resp = requests.get(self.url)
             return resp
-        except:
+        except _:
             colors.error('Error in network connection')
 
     def gather_header(self):
@@ -41,31 +41,31 @@ class HeaderVuln(object):
                     colors.error('X-XSS-Protection not set propely')
                 else:
                     colors.success('X-XSS-Protection set properly.')
-            except:
+            except _:
                 colors.info('Escaping')
 
             try:
                 contenttype = headers_dict['X-Content-Type-Options']
                 if contenttype != 'nosniff':
                     colors.error('X-Content-Type-Options not set properly.')
-            except:
+            except _:
                 colors.info('Escaping')
 
             try:
                 hsts = headers_dict['Strict-Transport-Security']
-            except:
+            except _:
                 colors.error('HSTS not set properly.')
 
             try:
                 csp = headers_dict['Content-Security-Policy']
                 colors.success('CSP set properly.')
-            except:
+            except _:
                 colors.error('CSP missing')
 
             try:
                 xframe = headers_dict['x-frame-options']
                 colors.success('Likely to be safe from X-Frame')
-            except:
+            except _:
                 colors.error('X-Frame Missing')
 
     def insecure_cookies(self):
@@ -98,16 +98,19 @@ class HeaderVuln(object):
 
             colors.success('Cookie secure : {}'.format(cookie.secure))
             colors.success('Cookie HTTP Only : {}'.format(cookie.httponly))
-            colors.success('Cookie domain initial dot : {}'.format(cookie.domain_initial_dot))
+            colors.success('Cookie domain initial dot : {}'
+                           .format(cookie.domain_initial_dot))
             print('\n')
             cookie_data.append('Cookie secure : {}'.format(cookie.secure))
             cookie_data.append('Cookie HTTP Only : {}'.format(cookie.httponly))
-            cookie_data.append('Cookie domain initial dot : {}'.format(cookie.domain_initial_dot) + '\n')
+            cookie_data.append('Cookie domain initial dot : {}'
+                               .format(cookie.domain_initial_dot) + '\n')
 
         return cookie_data
 
     def test_http_methods(self):
-        modes_list = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'TEST']
+        modes_list = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'TRACE',
+                      'TEST']
 
         colors.info('Testing HTTP methods')
         method_data = []
